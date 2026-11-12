@@ -1,5 +1,5 @@
 import { HeroIntro } from "./HeroIntro";
-import { BookingForm, type BookingData } from "./BookingForm";
+import { BookingForm, type BookingData } from "@/components/booking/BookingForm";
 
 export function HeroSection({ onBook }: { onBook?: (data: BookingData & { submissionId: string }) => void | string | Promise<void | string> }) {
   return (
