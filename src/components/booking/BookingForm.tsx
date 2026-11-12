@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState, type FormEvent } from "react";
 import { bookingSchema, earliestPickupDate } from "@/lib/booking-schema";
 import Button from "@/components/Button/Button";
-import { FormField } from "./FormField";
+import { FormField } from "../Form/FormField";
 import { BookingSuccess } from "./BookingSuccess";
 
 export type BookingData = {

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { BackgroundMesh } from "@/components/booking/BackgroundMesh";
-import { SiteNav } from "@/components/booking/SiteNav";
+import { BackgroundMesh } from "@/components/BackgroundMesh/BackgroundMesh";
+import { SiteNav } from "@/components/SiteNav/SiteNav";
 import { HeroSection } from "@/components/booking/HeroSection";
 import { useServerFn } from "@tanstack/react-start";
 import { submitBooking } from "@/lib/bookings.functions";

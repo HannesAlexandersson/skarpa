@@ -1,9 +1,9 @@
 import { Link } from "@tanstack/react-router";
 
 export function SiteFooter() {
-  return <footer className="relative z-[2] mt-auto bg-footer text-footer-foreground">
-    <div className="mx-auto grid max-w-[1240px] gap-8 px-[clamp(20px,5vw,56px)] py-12 sm:grid-cols-[1fr_1fr_1fr]">
-      <Link to="/" className="w-fit font-serif text-3xl">Skärpa.</Link>
+  return <footer className="relative z-2 mt-auto bg-footer text-footer-foreground">
+    <div className="mx-auto grid max-w-310 gap-8 px-[clamp(20px,5vw,56px)] py-12 sm:grid-cols-[1fr_1fr_1fr]">
+      <Link to="/" className="w-fit font-serif text-3xl">Skärpa<span className="text-accent">.</span></Link>
       <nav aria-label="Sidfotsnavigation" className="flex flex-col items-start gap-3">
         <Link to="/" className="underline-offset-4 hover:underline">Boka tid</Link>
         <Link to="/priser" className="underline-offset-4 hover:underline">Priser</Link>

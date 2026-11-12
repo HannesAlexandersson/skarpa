@@ -1,4 +1,4 @@
-import { StepTiles } from "./StepTiles";
+import { StepTiles } from "@/components/HeroSection/StepTiles/StepTiles";
 
 export function HeroIntro() {
   return (
@@ -10,7 +10,7 @@ export function HeroIntro() {
         <em className="text-accent">hämtade</em> vid din dörr.
       </h1>
       <p className="mb-10 max-w-[34ch] text-[clamp(1rem,1.5vw,1.2rem)] text-muted-foreground">
-        Välj en dag – vi hämtar, slipar för hand och lämnar tillbaka. Du behöver inte lyfta ett finger.
+        Välj en dag - vi hämtar, slipar för hand och lämnar tillbaka. Du behöver inte lyfta ett finger.
       </p>
       <StepTiles />
     </section>

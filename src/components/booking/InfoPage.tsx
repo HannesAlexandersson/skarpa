@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { BackgroundMesh } from "./BackgroundMesh";
-import { SiteNav } from "./SiteNav";
+import { BackgroundMesh } from "../BackgroundMesh/BackgroundMesh";
+import { SiteNav } from "../SiteNav/SiteNav";
 
 export function InfoPage({ title, children }: { title: string; children: React.ReactNode }) {
   return (
