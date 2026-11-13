@@ -14,11 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      blocked_dates: {
+        Row: {
+          blocked_date: string
+          created_at: string
+          reason: string | null
+          updated_at: string
+        }
+        Insert: {
+          blocked_date: string
+          created_at?: string
+          reason?: string | null
+          updated_at?: string
+        }
+        Update: {
+          blocked_date?: string
+          created_at?: string
+          reason?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       bookings: {
         Row: {
           created_at: string
           customer_id: string
           id: string
+          pickup_address: string
           pickup_date: string
           pickup_time: string
           submission_id: string
@@ -28,6 +50,7 @@ export type Database = {
           created_at?: string
           customer_id: string
           id?: string
+          pickup_address: string
           pickup_date: string
           pickup_time: string
           submission_id: string
@@ -37,6 +60,7 @@ export type Database = {
           created_at?: string
           customer_id?: string
           id?: string
+          pickup_address?: string
           pickup_date?: string
           pickup_time?: string
           submission_id?: string
@@ -82,11 +106,39 @@ export type Database = {
         }
         Relationships: []
       }
+      pickup_hours: {
+        Row: {
+          closes_at: string
+          created_at: string
+          opens_at: string
+          slot_minutes: number
+          updated_at: string
+          weekday: number
+        }
+        Insert: {
+          closes_at: string
+          created_at?: string
+          opens_at: string
+          slot_minutes?: number
+          updated_at?: string
+          weekday: number
+        }
+        Update: {
+          closes_at?: string
+          created_at?: string
+          opens_at?: string
+          slot_minutes?: number
+          updated_at?: string
+          weekday?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      normalize_phone: { Args: { p: string }; Returns: string }
       submit_pickup_booking: {
         Args: {
           p_address: string

@@ -33,4 +33,8 @@ use the editor.
 - Include separate date and time strings in BookingData so pickup requests retain the user's local selections.
 - Public booking intake uses a validated create-only server function and a service-role-only atomic SQL function; never expose customer reads or match/update customers by unverified email.
 - Keep a submission UUID for retries so a network retry cannot create a duplicate booking or customer.
+- Configure privileged booking credentials separately on each hosting service; missing server configuration must never fall back to public database access.
 - Mount SiteFooter in the root layout and keep legal destinations as public InfoPage routes so every page shares the same footer.
+
+- Customers are deduplicated by normalized email + phone in submit_pickup_booking and never overwritten from public input; bookings keep their own pickup_address. Why: email alone is unverified and could hijack another customer's record.
+- Pickup availability lives in pickup_hours/blocked_dates (public read, service-role write) and is enforced in both src/lib/availability.ts and the SQL function. Why: a future admin tool edits only these tables, and the server must reject slots the browser could fake.

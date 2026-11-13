@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState, type FormEvent } from "react";
-import { bookingSchema, earliestPickupDate } from "@/lib/booking-schema";
+import { bookingSchema, earliestPickupDate, type BookingFieldErrors } from "@/lib/booking-schema";
+import { DEFAULT_PICKUP_RULES, addDays, isSlotAllowed, slotsForDate, type PickupRules } from "@/lib/availability";
 import Button from "@/components/Button/Button";
 import { FormField } from "../Form/FormField";
 import { BookingSuccess } from "./BookingSuccess";
@@ -15,29 +16,41 @@ export type BookingData = {
 
 type BookingFormProps = {
   onSubmit?: ((data: BookingData & { submissionId: string }) => void | string | Promise<void | string>) | undefined;
+  rules?: PickupRules | undefined;
 };
 
-export function BookingForm({ onSubmit }: BookingFormProps) {
+export function BookingForm({ onSubmit, rules = DEFAULT_PICKUP_RULES }: BookingFormProps) {
   const [sent, setSent] = useState(false);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<BookingFieldErrors>({});
+  const [date, setDate] = useState("");
   const [bookingId, setBookingId] = useState<string | undefined>();
   const submissionId = useRef<string | undefined>(undefined);
   const minDate = useMemo(() => earliestPickupDate(), []);
+  const maxDate = addDays(minDate, rules.maxDaysAhead - 1);
+  const slots = date ? slotsForDate(rules, date) : [];
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (pending) return;
-    const form = e.currentTarget;
-    if (!form.checkValidity()) {
-      form.reportValidity();
-      return;
-    }
-    const parsed = bookingSchema.safeParse(Object.fromEntries(new FormData(form).entries()));
+    const parsed = bookingSchema.safeParse(Object.fromEntries(new FormData(e.currentTarget).entries()));
     if (!parsed.success) {
-      setError("Kontrollera dina kontaktuppgifter och välj ett giltigt datum och tid.");
+      const errs: BookingFieldErrors = {};
+      for (const issue of parsed.error.issues) {
+        const key = issue.path[0] as keyof BookingFieldErrors;
+        errs[key] ??= issue.message;
+      }
+      setFieldErrors(errs);
+      setError("Kontrollera de markerade fälten.");
       return;
     }
+    if (!isSlotAllowed(rules, parsed.data.date, parsed.data.time, minDate)) {
+      setFieldErrors({ time: "Den valda tiden går inte att boka. Välj en annan tid." });
+      setError("Kontrollera de markerade fälten.");
+      return;
+    }
+    setFieldErrors({});
     setError("");
     setPending(true);
     submissionId.current ??= crypto.randomUUID();
@@ -65,15 +78,24 @@ export function BookingForm({ onSubmit }: BookingFormProps) {
           <h2 id="formtitle" className="card-title">Boka tid för upphämtning</h2>
           <p className="mb-6 text-[0.95rem] text-muted-foreground">Fyll i dina uppgifter så hör vi av oss.</p>
           <form noValidate onSubmit={handleSubmit} className="grid gap-3.5">
-            <FormField id="name" label="Namn" type="text" autoComplete="name" placeholder="Förnamn Efternamn" required />
-            <FormField id="address" label="Adress" type="text" autoComplete="street-address" placeholder="Gatuadress, postnummer, ort" required />
+            <FormField id="name" label="Namn" type="text" autoComplete="name" placeholder="Förnamn Efternamn" maxLength={120} required error={fieldErrors.name} />
+            <FormField id="address" label="Adress" type="text" autoComplete="street-address" placeholder="Gatuadress, postnummer, ort" maxLength={500} required error={fieldErrors.address} />
             <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
-              <FormField id="phone" label="Telefon" type="tel" autoComplete="tel" placeholder="070-123 45 67" required />
-              <FormField id="email" label="E-post" type="email" autoComplete="email" placeholder="namn@mail.se" required />
+              <FormField id="phone" label="Telefon" type="tel" autoComplete="tel" placeholder="070-123 45 67" maxLength={40} required error={fieldErrors.phone} />
+              <FormField id="email" label="E-post" type="email" autoComplete="email" placeholder="namn@mail.se" maxLength={254} required error={fieldErrors.email} />
             </div>
             <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
-              <FormField id="date" label="Datum för upphämtning" type="date" min={minDate} required />
-              <FormField id="time" label="Tid för upphämtning" type="time" required />
+              <FormField id="date" label="Datum för upphämtning" type="date" min={minDate} max={maxDate} required
+                value={date} onChange={(e) => setDate(e.target.value)} error={fieldErrors.date} />
+              <div className="relative">
+                <label htmlFor="time" className="mb-1.5 ml-1 block text-[0.8rem] font-semibold tracking-wide">Tid för upphämtning</label>
+                <select id="time" name="time" className="field-input" required defaultValue="" disabled={!date || slots.length === 0}
+                  aria-invalid={fieldErrors.time ? true : undefined} aria-describedby={fieldErrors.time ? "time-error" : undefined}>
+                  <option value="" disabled>{!date ? "Välj datum först" : slots.length ? "Välj tid" : "Stängt denna dag"}</option>
+                  {slots.map((s) => <option key={s} value={s}>{s}</option>)}
+                </select>
+                {fieldErrors.time && <p id="time-error" className="ml-1 mt-1 text-xs text-destructive">{fieldErrors.time}</p>}
+              </div>
             </div>
             {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
             <Button type="submit" variant="accent" size="xl" className="mt-1.5" disabled={pending} aria-busy={pending}>

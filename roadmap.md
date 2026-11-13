@@ -1,7 +1,15 @@
 # Tasks
+- [x] Compare and preserve the latest GitHub main code before fixing production booking storage.
+- [x] Verify a preview booking saves with its linked customer and matching date/time.
+- [ ] Verify the failing production booking (owner confirms variables are configured; awaiting production URL and matching Vercel runtime log).
+- [x] Upload validated booking changes to GitHub main while preserving its current files.
 - [x] Add a required pickup time field and verify submission.
 - [x] Add a centered hover/click navigation menu and all four destination pages.
 - [x] Verify desktop/mobile behavior and commit changes.
 - [x] Save bookings and linked customer contact details securely.
 - [x] Add shared footer and terms/cookie destinations.
 - [x] Verify saved booking, error handling and footer on mobile/desktop.
+- [x] Stricter form validation with per-field messages.
+- [x] No duplicate customers (email + phone).
+- [x] Bookable days/hours rules incl. weekends (admin tool later).
+- [ ] Admin tool to edit pickup hours and blocked dates (future, not started).
