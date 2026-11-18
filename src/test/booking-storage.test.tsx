@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { BookingForm } from "@/components/booking/BookingForm";
 import { bookingRpcArgs, earliestPickupDate } from "@/lib/booking-schema";
 
-const details = { name: "Test Customer", address: "Testgatan 1", phone: "0701234567", email: "booking-test@example.com", date: earliestPickupDate(), time: "14:30" };
+const details = { name: "Test Customer", address: "Testgatan 1", phone: "0701234567", email: "booking-test@example.com", date: earliestPickupDate(), time: "14:30", paymentMethod: "invoice" as const };
 function fillForm() {
   for (const [id, value] of Object.entries(details)) fireEvent.change(document.getElementById(id) as HTMLInputElement, { target: { value } });
 }
@@ -12,7 +12,7 @@ describe("Booking storage", () => {
   it("sends customer contact details and separate pickup selections to the atomic booking operation", () => {
     expect(bookingRpcArgs({ ...details, submissionId: "b7d41702-56a0-4f98-8e30-e744f237471a" })).toEqual({
       p_name: "Test Customer", p_address: "Testgatan 1", p_phone: "0701234567", p_email: "booking-test@example.com",
-      p_date: details.date, p_time: "14:30", p_submission_id: "b7d41702-56a0-4f98-8e30-e744f237471a",
+      p_date: details.date, p_time: "14:30", p_submission_id: "b7d41702-56a0-4f98-8e30-e744f237471a", p_payment_method: "invoice",
     });
   });
   it("keeps failed bookings editable and retries with the same submission reference", async () => {

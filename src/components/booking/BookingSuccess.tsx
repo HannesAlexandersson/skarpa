@@ -1,4 +1,4 @@
-export function BookingSuccess({ bookingId }: { bookingId?: string | undefined }) {
+export function BookingSuccess({ bookingId, paymentMethod }: { bookingId?: string | undefined; paymentMethod?: string | undefined }) {
   return (
     <div role="status" aria-live="polite" className="animate-pop py-8 text-center">
       <div aria-hidden="true" className="mx-auto mb-4 grid size-16 place-items-center rounded-full bg-accent text-[1.8rem] text-accent-foreground">
@@ -6,6 +6,7 @@ export function BookingSuccess({ bookingId }: { bookingId?: string | undefined }
       </div>
       <h2 className="card-title">Tack!</h2>
       <p className="text-[0.95rem] text-muted-foreground">Din förfrågan är skickad. Vi hör av oss snart.</p>
+      {paymentMethod && <p className="mt-3 text-sm text-muted-foreground">Betalsätt: {paymentMethod}</p>}
       {bookingId && <p className="mt-4 break-all text-xs text-muted-foreground">Bokningsreferens: {bookingId}</p>}
     </div>
   );

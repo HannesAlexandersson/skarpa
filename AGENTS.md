@@ -38,3 +38,5 @@ use the editor.
 
 - Customers are deduplicated by normalized email + phone in submit_pickup_booking and never overwritten from public input; bookings keep their own pickup_address. Why: email alone is unverified and could hijack another customer's record.
 - Pickup availability lives in pickup_hours/blocked_dates (public read, service-role write) and is enforced in both src/lib/availability.ts and the SQL function. Why: a future admin tool edits only these tables, and the server must reject slots the browser could fake.
+- Payments reference bookings (payments.booking_id, one-to-many) with a single payment_status enum and a payment_methods lookup; never store customer_id on payments or payment_id on bookings. Why: the customer is derivable via the booking, and duplicated links drift.
+- The form's PAYMENT_METHODS list must match active payment_methods rows; submit_pickup_booking rejects inactive methods and creates the pending payment atomically.

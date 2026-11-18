@@ -12,4 +12,7 @@
 - [x] Stricter form validation with per-field messages.
 - [x] No duplicate customers (email + phone).
 - [x] Bookable days/hours rules incl. weekends (admin tool later).
-- [ ] Admin tool to edit pickup hours and blocked dates (future, not started).
+- [x] Payments foundation: payment methods, payment status per booking, method chosen in form.
+- [ ] Real payments via Stripe (backlog).
+- [ ] Booking confirmation email (waiting on own domain).
+- [ ] Admin tool to edit pickup hours, blocked dates and payment status (future, not started).

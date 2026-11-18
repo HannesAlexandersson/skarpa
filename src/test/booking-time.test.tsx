@@ -10,7 +10,7 @@ describe("Pickup time", () => {
     for (const [label, value] of [
       ["Namn", "Test Person"], ["Adress", "Testgatan 1"],
       ["Telefon", "0701234567"], ["E-post", "test@example.com"],
-      ["Datum för upphämtning", earliestPickupDate()], ["Tid för upphämtning", "14:30"],
+      ["Datum för upphämtning", earliestPickupDate()], ["Tid för upphämtning", "14:30"], ["Betalsätt", "cash"],
     ] as const) {
       fireEvent.change(screen.getByLabelText(label), { target: { value } });
     }

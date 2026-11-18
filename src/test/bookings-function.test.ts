@@ -14,7 +14,7 @@ import { submitBooking } from "@/lib/bookings.functions";
 
 const data = {
   name: "Booking test", address: "Testgatan 1", phone: "0700000000",
-  email: "booking-test@example.com", date: "2099-12-01", time: "14:30",
+  email: "booking-test@example.com", date: "2099-12-01", time: "14:30", paymentMethod: "swish",
   submissionId: "b7d41702-56a0-4f98-8e30-e744f237471a",
 };
 
@@ -24,7 +24,7 @@ describe("Public booking server function", () => {
     rpc.mockResolvedValue({ data: "saved-booking-id", error: null });
     expect(await submitBooking({ data })).toEqual({ ok: true, bookingId: "saved-booking-id" });
     expect(rpc).toHaveBeenCalledWith("submit_pickup_booking", expect.objectContaining({
-      p_submission_id: data.submissionId, p_date: "2099-12-01", p_time: "14:30",
+      p_submission_id: data.submissionId, p_date: "2099-12-01", p_time: "14:30", p_payment_method: "swish",
     }));
   });
   it("does not report a saved booking or expose infrastructure errors when configuration is missing", async () => {

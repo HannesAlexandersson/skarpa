@@ -106,6 +106,93 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_methods: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          label: string
+          sort_order: number
+          timing: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          label: string
+          sort_order?: number
+          timing: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          label?: string
+          sort_order?: number
+          timing?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      payments: {
+        Row: {
+          amount_ore: number | null
+          booking_id: string
+          created_at: string
+          currency: string
+          id: string
+          invoiced_at: string | null
+          method_code: string
+          paid_at: string | null
+          provider_reference: string | null
+          status: Database["public"]["Enums"]["payment_status"]
+          updated_at: string
+        }
+        Insert: {
+          amount_ore?: number | null
+          booking_id: string
+          created_at?: string
+          currency?: string
+          id?: string
+          invoiced_at?: string | null
+          method_code: string
+          paid_at?: string | null
+          provider_reference?: string | null
+          status?: Database["public"]["Enums"]["payment_status"]
+          updated_at?: string
+        }
+        Update: {
+          amount_ore?: number | null
+          booking_id?: string
+          created_at?: string
+          currency?: string
+          id?: string
+          invoiced_at?: string | null
+          method_code?: string
+          paid_at?: string | null
+          provider_reference?: string | null
+          status?: Database["public"]["Enums"]["payment_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_method_code_fkey"
+            columns: ["method_code"]
+            isOneToOne: false
+            referencedRelation: "payment_methods"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
       pickup_hours: {
         Row: {
           closes_at: string
@@ -145,6 +232,7 @@ export type Database = {
           p_date: string
           p_email: string
           p_name: string
+          p_payment_method: string
           p_phone: string
           p_submission_id: string
           p_time: string
@@ -153,7 +241,7 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      payment_status: "pending" | "invoiced" | "paid" | "refunded" | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -280,6 +368,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      payment_status: ["pending", "invoiced", "paid", "refunded", "cancelled"],
+    },
   },
 } as const

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { bookingSchema, normalizePhone } from "@/lib/booking-schema";
 import { DEFAULT_PICKUP_RULES, isSlotAllowed, slotsForDate } from "@/lib/availability";
 
-const base = { name: "Anna Svensson", address: "Testgatan 1", phone: "070-123 45 67", email: " Anna@Example.se ", date: "2099-12-01", time: "14:30" };
+const base = { name: "Anna Svensson", address: "Testgatan 1", phone: "070-123 45 67", email: " Anna@Example.se ", date: "2099-12-01", time: "14:30", paymentMethod: "klarna" };
 
 describe("Booking rules", () => {
   it("normalizes Swedish phone numbers so the same customer is recognised", () => {

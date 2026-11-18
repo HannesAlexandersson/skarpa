@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState, type FormEvent } from "react";
-import { bookingSchema, earliestPickupDate, type BookingFieldErrors } from "@/lib/booking-schema";
+import { PAYMENT_METHODS, bookingSchema, earliestPickupDate, type BookingFieldErrors, type PaymentMethodCode } from "@/lib/booking-schema";
 import { DEFAULT_PICKUP_RULES, addDays, isSlotAllowed, slotsForDate, type PickupRules } from "@/lib/availability";
 import Button from "@/components/Button/Button";
 import { FormField } from "../Form/FormField";
@@ -12,6 +12,7 @@ export type BookingData = {
   email: string;
   date: string;
   time: string;
+  paymentMethod: PaymentMethodCode;
 };
 
 type BookingFormProps = {
@@ -26,6 +27,7 @@ export function BookingForm({ onSubmit, rules = DEFAULT_PICKUP_RULES }: BookingF
   const [fieldErrors, setFieldErrors] = useState<BookingFieldErrors>({});
   const [date, setDate] = useState("");
   const [bookingId, setBookingId] = useState<string | undefined>();
+  const [paidWith, setPaidWith] = useState<string | undefined>();
   const submissionId = useRef<string | undefined>(undefined);
   const minDate = useMemo(() => earliestPickupDate(), []);
   const maxDate = addDays(minDate, rules.maxDaysAhead - 1);
@@ -58,6 +60,7 @@ export function BookingForm({ onSubmit, rules = DEFAULT_PICKUP_RULES }: BookingF
       if (!onSubmit) throw new Error("Bokningen kunde inte sparas.");
       const reference = await onSubmit({ ...parsed.data, submissionId: submissionId.current });
       setBookingId(typeof reference === "string" ? reference : undefined);
+      setPaidWith(PAYMENT_METHODS.find((m) => m.code === parsed.data.paymentMethod)?.label);
       setSent(true);
     } catch {
       setError("Bokningen kunde inte sparas. Dina uppgifter finns kvar – försök igen om en stund.");
@@ -72,7 +75,7 @@ export function BookingForm({ onSubmit, rules = DEFAULT_PICKUP_RULES }: BookingF
       className="glass-strong mt-2 rounded-[32px] border border-line p-[clamp(22px,3vw,38px)] shadow-card min-[900px]:-ml-12 min-[900px]:mt-[clamp(0px,4vw,56px)]"
     >
       {sent ? (
-        <BookingSuccess bookingId={bookingId} />
+        <BookingSuccess bookingId={bookingId} paymentMethod={paidWith} />
       ) : (
         <>
           <h2 id="formtitle" className="card-title">Boka tid för upphämtning</h2>
@@ -96,6 +99,20 @@ export function BookingForm({ onSubmit, rules = DEFAULT_PICKUP_RULES }: BookingF
                 </select>
                 {fieldErrors.time && <p id="time-error" className="ml-1 mt-1 text-xs text-destructive">{fieldErrors.time}</p>}
               </div>
+            </div>
+            <div className="relative">
+              <label htmlFor="paymentMethod" className="mb-1.5 ml-1 block text-[0.8rem] font-semibold tracking-wide">Betalsätt</label>
+              <select id="paymentMethod" name="paymentMethod" className="field-input" required defaultValue=""
+                aria-invalid={fieldErrors.paymentMethod ? true : undefined} aria-describedby={fieldErrors.paymentMethod ? "paymentMethod-error" : undefined}>
+                <option value="" disabled>Välj betalsätt</option>
+                <optgroup label="Betala senare">
+                  {PAYMENT_METHODS.filter((m) => m.timing === "after").map((m) => <option key={m.code} value={m.code}>{m.label}</option>)}
+                </optgroup>
+                <optgroup label="Betala innan">
+                  {PAYMENT_METHODS.filter((m) => m.timing === "before").map((m) => <option key={m.code} value={m.code}>{m.label}</option>)}
+                </optgroup>
+              </select>
+              {fieldErrors.paymentMethod && <p id="paymentMethod-error" className="ml-1 mt-1 text-xs text-destructive">{fieldErrors.paymentMethod}</p>}
             </div>
             {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
             <Button type="submit" variant="accent" size="xl" className="mt-1.5" disabled={pending} aria-busy={pending}>
