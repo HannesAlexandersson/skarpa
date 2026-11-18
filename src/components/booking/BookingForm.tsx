@@ -4,6 +4,7 @@ import { DEFAULT_PICKUP_RULES, addDays, isSlotAllowed, slotsForDate, type Pickup
 import Button from "@/components/Button/Button";
 import { FormField } from "../Form/FormField";
 import { BookingSuccess } from "./BookingSuccess";
+import { DEFAULT_PRICING, MAX_KNIVES, calculatePriceOre, campaignFor, formatKr } from "@/lib/pricing";
 
 export type BookingData = {
   name: string;
@@ -13,6 +14,7 @@ export type BookingData = {
   date: string;
   time: string;
   paymentMethod: PaymentMethodCode;
+  knifeCount: number;
 };
 
 type BookingFormProps = {
@@ -32,6 +34,13 @@ export function BookingForm({ onSubmit, rules = DEFAULT_PICKUP_RULES }: BookingF
   const minDate = useMemo(() => earliestPickupDate(), []);
   const maxDate = addDays(minDate, rules.maxDaysAhead - 1);
   const slots = date ? slotsForDate(rules, date) : [];
+  const [knives, setKnives] = useState("1");
+  const [summary, setSummary] = useState<{ knives: number; price?: string | undefined }>();
+  const pricing = rules.pricing ?? DEFAULT_PRICING;
+  const knifeNum = Number(knives);
+  const priceOre = calculatePriceOre(pricing, knifeNum, date || undefined);
+  const methods = rules.activePaymentMethods ? PAYMENT_METHODS.filter((m) => rules.activePaymentMethods!.includes(m.code)) : PAYMENT_METHODS;
+  const campaign = campaignFor(pricing, date || undefined);
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -61,6 +70,8 @@ export function BookingForm({ onSubmit, rules = DEFAULT_PICKUP_RULES }: BookingF
       const reference = await onSubmit({ ...parsed.data, submissionId: submissionId.current });
       setBookingId(typeof reference === "string" ? reference : undefined);
       setPaidWith(PAYMENT_METHODS.find((m) => m.code === parsed.data.paymentMethod)?.label);
+      const ore = calculatePriceOre(pricing, parsed.data.knifeCount, parsed.data.date);
+      setSummary({ knives: parsed.data.knifeCount, price: ore === null ? undefined : formatKr(ore) });
       setSent(true);
     } catch {
       setError("Bokningen kunde inte sparas. Dina uppgifter finns kvar – försök igen om en stund.");
@@ -75,7 +86,7 @@ export function BookingForm({ onSubmit, rules = DEFAULT_PICKUP_RULES }: BookingF
       className="glass-strong mt-2 rounded-[32px] border border-line p-[clamp(22px,3vw,38px)] shadow-card min-[900px]:-ml-12 min-[900px]:mt-[clamp(0px,4vw,56px)]"
     >
       {sent ? (
-        <BookingSuccess bookingId={bookingId} paymentMethod={paidWith} />
+        <BookingSuccess bookingId={bookingId} paymentMethod={paidWith} knives={summary?.knives} priceText={summary?.price} />
       ) : (
         <>
           <h2 id="formtitle" className="card-title">Boka tid för upphämtning</h2>
@@ -100,16 +111,28 @@ export function BookingForm({ onSubmit, rules = DEFAULT_PICKUP_RULES }: BookingF
                 {fieldErrors.time && <p id="time-error" className="ml-1 mt-1 text-xs text-destructive">{fieldErrors.time}</p>}
               </div>
             </div>
+            <div>
+              <FormField id="knifeCount" label="Antal knivar" type="number" inputMode="numeric" min={1} max={MAX_KNIVES} step={1} required
+                value={knives} onChange={(e) => setKnives(e.target.value)} error={fieldErrors.knifeCount} />
+              <p aria-live="polite" className="ml-1 mt-1.5 text-sm text-muted-foreground">
+                {priceOre !== null && knifeNum <= MAX_KNIVES ? (
+                  <>
+                    {campaign && <span className="font-semibold text-accent">{campaign.name}: första kniven {formatKr(campaign.firstKnifePriceOre)} · </span>}
+                    Preliminärt pris för {knifeNum} {knifeNum === 1 ? "kniv" : "knivar"}: <strong className="text-foreground">{formatKr(priceOre)}</strong>
+                  </>
+                ) : "Ange antal knivar för att se priset."}
+              </p>
+            </div>
             <div className="relative">
               <label htmlFor="paymentMethod" className="mb-1.5 ml-1 block text-[0.8rem] font-semibold tracking-wide">Betalsätt</label>
               <select id="paymentMethod" name="paymentMethod" className="field-input" required defaultValue=""
                 aria-invalid={fieldErrors.paymentMethod ? true : undefined} aria-describedby={fieldErrors.paymentMethod ? "paymentMethod-error" : undefined}>
                 <option value="" disabled>Välj betalsätt</option>
                 <optgroup label="Betala senare">
-                  {PAYMENT_METHODS.filter((m) => m.timing === "after").map((m) => <option key={m.code} value={m.code}>{m.label}</option>)}
+                  {methods.filter((m) => m.timing === "after").map((m) => <option key={m.code} value={m.code}>{m.label}</option>)}
                 </optgroup>
                 <optgroup label="Betala innan">
-                  {PAYMENT_METHODS.filter((m) => m.timing === "before").map((m) => <option key={m.code} value={m.code}>{m.label}</option>)}
+                  {methods.filter((m) => m.timing === "before").map((m) => <option key={m.code} value={m.code}>{m.label}</option>)}
                 </optgroup>
               </select>
               {fieldErrors.paymentMethod && <p id="paymentMethod-error" className="ml-1 mt-1 text-xs text-destructive">{fieldErrors.paymentMethod}</p>}

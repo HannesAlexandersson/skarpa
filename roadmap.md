@@ -16,3 +16,6 @@
 - [ ] Real payments via Stripe (backlog).
 - [ ] Booking confirmation email (waiting on own domain).
 - [ ] Admin tool to edit pickup hours, blocked dates and payment status (future, not started).
+
+- [x] Knife count, live preliminary price, pricing tiers and first-knife campaigns
+- [x] Admin API + admin web: payments status, payment methods, prices/campaigns, pickup hours, closed dates

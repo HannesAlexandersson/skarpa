@@ -1,5 +1,7 @@
 export type PickupHours = { weekday: number; opensAt: string; closesAt: string; slotMinutes: number };
-export type PickupRules = { hours: PickupHours[]; blockedDates: string[]; maxDaysAhead: number };
+import { DEFAULT_PRICING, type PricingRules } from "./pricing";
+
+export type PickupRules = { hours: PickupHours[]; blockedDates: string[]; maxDaysAhead: number; pricing?: PricingRules; activePaymentMethods?: string[] };
 
 export const MAX_DAYS_AHEAD = 60;
 
@@ -8,6 +10,7 @@ export const DEFAULT_PICKUP_RULES: PickupRules = {
   hours: [1, 2, 3, 4, 5, 6, 7].map((weekday) => ({ weekday, opensAt: "08:00", closesAt: "18:00", slotMinutes: 30 })),
   blockedDates: [],
   maxDaysAhead: MAX_DAYS_AHEAD,
+  pricing: DEFAULT_PRICING,
 };
 
 const toMinutes = (t: string) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));

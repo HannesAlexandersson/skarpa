@@ -40,6 +40,7 @@ export type Database = {
           created_at: string
           customer_id: string
           id: string
+          knife_count: number
           pickup_address: string
           pickup_date: string
           pickup_time: string
@@ -50,6 +51,7 @@ export type Database = {
           created_at?: string
           customer_id: string
           id?: string
+          knife_count?: number
           pickup_address: string
           pickup_date: string
           pickup_time: string
@@ -60,6 +62,7 @@ export type Database = {
           created_at?: string
           customer_id?: string
           id?: string
+          knife_count?: number
           pickup_address?: string
           pickup_date?: string
           pickup_time?: string
@@ -220,17 +223,76 @@ export type Database = {
         }
         Relationships: []
       }
+      pricing_campaigns: {
+        Row: {
+          active: boolean
+          created_at: string
+          ends_on: string | null
+          first_knife_price_ore: number
+          id: string
+          name: string
+          starts_on: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          ends_on?: string | null
+          first_knife_price_ore: number
+          id?: string
+          name: string
+          starts_on?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          ends_on?: string | null
+          first_knife_price_ore?: number
+          id?: string
+          name?: string
+          starts_on?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      pricing_tiers: {
+        Row: {
+          created_at: string
+          min_knives: number
+          price_per_knife_ore: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          min_knives: number
+          price_per_knife_ore: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          min_knives?: number
+          price_per_knife_ore?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      calculate_price_ore: {
+        Args: { p_date: string; p_knife_count: number }
+        Returns: number
+      }
       normalize_phone: { Args: { p: string }; Returns: string }
       submit_pickup_booking: {
         Args: {
           p_address: string
           p_date: string
           p_email: string
+          p_knife_count: number
           p_name: string
           p_payment_method: string
           p_phone: string

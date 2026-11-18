@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { MAX_KNIVES } from "./pricing";
 
 export function earliestPickupDate(now = new Date()) {
   const today = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Stockholm", year: "numeric", month: "2-digit", day: "2-digit" }).format(now);
@@ -47,6 +48,7 @@ export const bookingSchema = z.object({
   }, "Välj ett datum från och med i morgon."),
   time: z.string({ required_error: "Välj en tid." }).regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Välj en tid."),
   paymentMethod: z.enum(paymentCodes, { message: "Välj ett betalsätt." }),
+  knifeCount: z.coerce.number({ invalid_type_error: "Ange antal knivar." }).int("Ange ett heltal.").min(1, "Minst 1 kniv.").max(MAX_KNIVES, `Högst ${MAX_KNIVES} knivar – kontakta oss för större beställningar.`).default(1),
 });
 
 export type BookingFieldErrors = Partial<Record<keyof z.infer<typeof bookingSchema>, string>>;
@@ -55,5 +57,5 @@ export const bookingSubmissionSchema = bookingSchema.extend({ submissionId: z.st
 
 export function bookingRpcArgs(data: z.infer<typeof bookingSubmissionSchema>) {
   return { p_name: data.name, p_address: data.address, p_phone: data.phone, p_email: data.email,
-    p_date: data.date, p_time: data.time, p_submission_id: data.submissionId, p_payment_method: data.paymentMethod };
+    p_date: data.date, p_time: data.time, p_submission_id: data.submissionId, p_payment_method: data.paymentMethod, p_knife_count: data.knifeCount };
 }
