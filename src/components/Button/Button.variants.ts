@@ -5,7 +5,7 @@ export const buttonVariants = cva(
   {
     variants: {
       variant: {
-        nav: "flex items-center justify-center bg-transparent text-foreground hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        nav: "flex items-center justify-center bg-accent text-foreground hover:text-accent hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         primary: "bg-secondaryAccent text-white hover:bg-primaryAccent",
         secondary:
           "bg-transparent border-2 border-secondaryAccent text-secondaryAccent hover:bg-secondaryAccent hover:text-white",
