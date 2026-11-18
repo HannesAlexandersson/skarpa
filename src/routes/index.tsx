@@ -12,9 +12,9 @@ const availabilityQuery = queryOptions({ queryKey: ["pickup-availability"], quer
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Skärpa – Boka tid för upphämtning" },
+      { title: "Skärpa – Knivsliperi" },
       { name: "description", content: "Knivslipning med upphämtning. Vi hämtar, slipar för hand och lämnar tillbaka." },
-      { property: "og:title", content: "Skärpa – Boka tid för upphämtning" },
+      { property: "og:title", content: "Skärpa – Knivsliperi" },
       { property: "og:description", content: "Knivslipning med upphämtning. Vi hämtar, slipar för hand och lämnar tillbaka." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
