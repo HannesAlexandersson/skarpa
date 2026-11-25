@@ -1,7 +1,7 @@
 # Tasks
 - [x] Compare and preserve the latest GitHub main code before fixing production booking storage.
 - [x] Verify a preview booking saves with its linked customer and matching date/time.
-- [ ] Verify the failing production booking (owner confirms variables are configured; awaiting production URL and matching Vercel runtime log).
+- [x] Verify the production booking flow (confirmed by the owner after deployment).
 - [x] Upload validated booking changes to GitHub main while preserving its current files.
 - [x] Add a required pickup time field and verify submission.
 - [x] Add a centered hover/click navigation menu and all four destination pages.
@@ -15,7 +15,11 @@
 - [x] Payments foundation: payment methods, payment status per booking, method chosen in form.
 - [ ] Real payments via Stripe (backlog).
 - [ ] Booking confirmation email (waiting on own domain).
-- [ ] Admin tool to edit pickup hours, blocked dates and payment status (future, not started).
+- [x] Admin tool to edit pickup hours, blocked dates and payment status.
 
 - [x] Knife count, live preliminary price, pricing tiers and first-knife campaigns
 - [x] Admin API + admin web: payments status, payment methods, prices/campaigns, pickup hours, closed dates
+- [x] Sync the latest GitHub main changes, including navbar/dropdown styling and customer policy.
+- [x] Require explicit withdrawal-period consent in a popup before saving a booking.
+- [x] Store consent evidence on bookings and expose it in the admin API and admin web.
+- [x] Test cancellation, validation, consent persistence, retry behavior and the complete booking flow.

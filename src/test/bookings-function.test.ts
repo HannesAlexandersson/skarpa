@@ -15,7 +15,7 @@ import { submitBooking } from "@/lib/bookings.functions";
 const data = {
   name: "Booking test", address: "Testgatan 1", phone: "0700000000",
   email: "booking-test@example.com", date: "2099-12-01", time: "14:30", paymentMethod: "swish",
-  submissionId: "b7d41702-56a0-4f98-8e30-e744f237471a",
+  submissionId: "b7d41702-56a0-4f98-8e30-e744f237471a", withdrawalConsent: true,
 };
 
 describe("Public booking server function", () => {
@@ -25,6 +25,8 @@ describe("Public booking server function", () => {
     expect(await submitBooking({ data })).toEqual({ ok: true, bookingId: "saved-booking-id" });
     expect(rpc).toHaveBeenCalledWith("submit_pickup_booking", expect.objectContaining({
       p_submission_id: data.submissionId, p_date: "2099-12-01", p_time: "14:30", p_payment_method: "swish", p_knife_count: 1,
+      p_withdrawal_consent: true, p_withdrawal_consent_text: "Jag begär uttryckligen att Skärpa påbörjar tjänsten under ångerfristen och jag samtycker till att ångerrätten upphör när tjänsten är utförd.",
+      p_withdrawal_consent_version: "2026-11-25",
     }));
   });
   it("does not report a saved booking or expose infrastructure errors when configuration is missing", async () => {

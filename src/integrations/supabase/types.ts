@@ -46,6 +46,9 @@ export type Database = {
           pickup_time: string
           submission_id: string
           updated_at: string
+          withdrawal_consent_at: string | null
+          withdrawal_consent_text: string | null
+          withdrawal_consent_version: string | null
         }
         Insert: {
           created_at?: string
@@ -57,6 +60,9 @@ export type Database = {
           pickup_time: string
           submission_id: string
           updated_at?: string
+          withdrawal_consent_at?: string | null
+          withdrawal_consent_text?: string | null
+          withdrawal_consent_version?: string | null
         }
         Update: {
           created_at?: string
@@ -68,6 +74,9 @@ export type Database = {
           pickup_time?: string
           submission_id?: string
           updated_at?: string
+          withdrawal_consent_at?: string | null
+          withdrawal_consent_text?: string | null
+          withdrawal_consent_version?: string | null
         }
         Relationships: [
           {
@@ -298,6 +307,9 @@ export type Database = {
           p_phone: string
           p_submission_id: string
           p_time: string
+          p_withdrawal_consent: boolean
+          p_withdrawal_consent_text: string
+          p_withdrawal_consent_version: string
         }
         Returns: string
       }

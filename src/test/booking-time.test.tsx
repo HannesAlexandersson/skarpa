@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { BookingForm } from "@/components/booking/BookingForm";
-import { earliestPickupDate } from "@/lib/booking-schema";
+import { earliestPickupDate, WITHDRAWAL_CONSENT_TEXT } from "@/lib/booking-schema";
 
 describe("Pickup time", () => {
   it("includes the selected time in a booking", async () => {
@@ -15,6 +15,8 @@ describe("Pickup time", () => {
       fireEvent.change(screen.getByLabelText(label), { target: { value } });
     }
     fireEvent.click(screen.getByRole("button", { name: "Boka upphämtning" }));
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ date: earliestPickupDate(), time: "14:30" })));
+    fireEvent.click(screen.getByLabelText(WITHDRAWAL_CONSENT_TEXT));
+    fireEvent.click(screen.getByRole("button", { name: "Bekräfta och boka" }));
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ date: earliestPickupDate(), time: "14:30", withdrawalConsent: true })));
   });
 });

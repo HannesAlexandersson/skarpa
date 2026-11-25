@@ -4,6 +4,7 @@ import { DEFAULT_PICKUP_RULES, addDays, isSlotAllowed, slotsForDate, type Pickup
 import Button from "@/components/Button/Button";
 import { FormField } from "../Form/FormField";
 import { BookingSuccess } from "./BookingSuccess";
+import { WithdrawalConsentDialog } from "./WithdrawalConsentDialog";
 import { DEFAULT_PRICING, MAX_KNIVES, calculatePriceOre, campaignFor, formatKr } from "@/lib/pricing";
 
 export type BookingData = {
@@ -17,8 +18,10 @@ export type BookingData = {
   knifeCount: number;
 };
 
+export type BookingSubmission = BookingData & { submissionId: string; withdrawalConsent: true };
+
 type BookingFormProps = {
-  onSubmit?: ((data: BookingData & { submissionId: string }) => void | string | Promise<void | string>) | undefined;
+  onSubmit?: ((data: BookingSubmission) => void | string | Promise<void | string>) | undefined;
   rules?: PickupRules | undefined;
 };
 
@@ -30,6 +33,8 @@ export function BookingForm({ onSubmit, rules = DEFAULT_PICKUP_RULES }: BookingF
   const [date, setDate] = useState("");
   const [bookingId, setBookingId] = useState<string | undefined>();
   const [paidWith, setPaidWith] = useState<string | undefined>();
+  const [consentBooking, setConsentBooking] = useState<(BookingData & { submissionId: string }) | undefined>();
+  const [consentAccepted, setConsentAccepted] = useState(false);
   const submissionId = useRef<string | undefined>(undefined);
   const minDate = useMemo(() => earliestPickupDate(), []);
   const maxDate = addDays(minDate, rules.maxDaysAhead - 1);
@@ -42,7 +47,7 @@ export function BookingForm({ onSubmit, rules = DEFAULT_PICKUP_RULES }: BookingF
   const methods = rules.activePaymentMethods ? PAYMENT_METHODS.filter((m) => rules.activePaymentMethods!.includes(m.code)) : PAYMENT_METHODS;
   const campaign = campaignFor(pricing, date || undefined);
 
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (pending) return;
     const parsed = bookingSchema.safeParse(Object.fromEntries(new FormData(e.currentTarget).entries()));
@@ -63,17 +68,33 @@ export function BookingForm({ onSubmit, rules = DEFAULT_PICKUP_RULES }: BookingF
     }
     setFieldErrors({});
     setError("");
-    setPending(true);
     submissionId.current ??= crypto.randomUUID();
+    setConsentAccepted(false);
+    setConsentBooking({ ...parsed.data, submissionId: submissionId.current });
+  }
+
+  function closeConsent() {
+    if (pending) return;
+    setConsentBooking(undefined);
+    setConsentAccepted(false);
+  }
+
+  async function confirmBooking() {
+    if (!consentBooking || !consentAccepted || pending) return;
+    setPending(true);
+    setError("");
     try {
       if (!onSubmit) throw new Error("Bokningen kunde inte sparas.");
-      const reference = await onSubmit({ ...parsed.data, submissionId: submissionId.current });
+      const reference = await onSubmit({ ...consentBooking, withdrawalConsent: true });
       setBookingId(typeof reference === "string" ? reference : undefined);
-      setPaidWith(PAYMENT_METHODS.find((m) => m.code === parsed.data.paymentMethod)?.label);
-      const ore = calculatePriceOre(pricing, parsed.data.knifeCount, parsed.data.date);
-      setSummary({ knives: parsed.data.knifeCount, price: ore === null ? undefined : formatKr(ore) });
+      setPaidWith(PAYMENT_METHODS.find((m) => m.code === consentBooking.paymentMethod)?.label);
+      const ore = calculatePriceOre(pricing, consentBooking.knifeCount, consentBooking.date);
+      setSummary({ knives: consentBooking.knifeCount, price: ore === null ? undefined : formatKr(ore) });
+      setConsentBooking(undefined);
       setSent(true);
     } catch {
+      setConsentBooking(undefined);
+      setConsentAccepted(false);
       setError("Bokningen kunde inte sparas. Dina uppgifter finns kvar – försök igen om en stund.");
     } finally {
       setPending(false);
@@ -85,6 +106,14 @@ export function BookingForm({ onSubmit, rules = DEFAULT_PICKUP_RULES }: BookingF
       aria-labelledby="formtitle"
       className="glass-strong mt-2 rounded-[32px] border border-line p-[clamp(22px,3vw,38px)] shadow-card min-[900px]:-ml-12 min-[900px]:mt-[clamp(0px,4vw,56px)]"
     >
+      <WithdrawalConsentDialog
+        open={consentBooking !== undefined}
+        accepted={consentAccepted}
+        pending={pending}
+        onAcceptedChange={setConsentAccepted}
+        onCancel={closeConsent}
+        onConfirm={confirmBooking}
+      />
       {sent ? (
         <BookingSuccess bookingId={bookingId} paymentMethod={paidWith} knives={summary?.knives} priceText={summary?.price} />
       ) : (
@@ -139,7 +168,7 @@ export function BookingForm({ onSubmit, rules = DEFAULT_PICKUP_RULES }: BookingF
             </div>
             {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
             <Button type="submit" variant="accent" size="xl" className="mt-1.5" disabled={pending} aria-busy={pending}>
-              {pending ? "Sparar bokning…" : "Boka upphämtning"}
+              Boka upphämtning
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="transition-transform duration-300 group-hover:translate-x-1">
                 <path d="M5 12h14M13 6l6 6-6 6" />
               </svg>

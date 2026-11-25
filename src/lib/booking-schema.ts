@@ -53,9 +53,16 @@ export const bookingSchema = z.object({
 
 export type BookingFieldErrors = Partial<Record<keyof z.infer<typeof bookingSchema>, string>>;
 
-export const bookingSubmissionSchema = bookingSchema.extend({ submissionId: z.string().uuid() });
+export const WITHDRAWAL_CONSENT_VERSION = "2026-11-25";
+export const WITHDRAWAL_CONSENT_TEXT = "Jag begär uttryckligen att Skärpa påbörjar tjänsten under ångerfristen och jag samtycker till att ångerrätten upphör när tjänsten är utförd.";
+
+export const bookingSubmissionSchema = bookingSchema.extend({
+  submissionId: z.string().uuid(),
+  withdrawalConsent: z.literal(true, { errorMap: () => ({ message: "Du måste samtycka för att slutföra bokningen." }) }),
+});
 
 export function bookingRpcArgs(data: z.infer<typeof bookingSubmissionSchema>) {
   return { p_name: data.name, p_address: data.address, p_phone: data.phone, p_email: data.email,
-    p_date: data.date, p_time: data.time, p_submission_id: data.submissionId, p_payment_method: data.paymentMethod, p_knife_count: data.knifeCount };
+    p_date: data.date, p_time: data.time, p_submission_id: data.submissionId, p_payment_method: data.paymentMethod, p_knife_count: data.knifeCount,
+    p_withdrawal_consent: data.withdrawalConsent, p_withdrawal_consent_text: WITHDRAWAL_CONSENT_TEXT, p_withdrawal_consent_version: WITHDRAWAL_CONSENT_VERSION };
 }
