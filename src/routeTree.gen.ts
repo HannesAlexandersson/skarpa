@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CookiepolicyRouteImport } from './routes/cookiepolicy'
+import { Route as CustomerpolicyRouteImport } from './routes/customerpolicy'
 import { Route as KontaktRouteImport } from './routes/kontakt'
 import { Route as OmOssRouteImport } from './routes/om-oss'
 import { Route as PriserRouteImport } from './routes/priser'
@@ -24,6 +25,11 @@ const IndexRoute = IndexRouteImport.update({
 const CookiepolicyRoute = CookiepolicyRouteImport.update({
   id: '/cookiepolicy',
   path: '/cookiepolicy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CustomerpolicyRoute = CustomerpolicyRouteImport.update({
+  id: '/customerpolicy',
+  path: '/customerpolicy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const KontaktRoute = KontaktRouteImport.update({
@@ -50,6 +56,7 @@ const VillkorRoute = VillkorRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/cookiepolicy': typeof CookiepolicyRoute
+  '/customerpolicy': typeof CustomerpolicyRoute
   '/kontakt': typeof KontaktRoute
   '/om-oss': typeof OmOssRoute
   '/priser': typeof PriserRoute
@@ -58,6 +65,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/cookiepolicy': typeof CookiepolicyRoute
+  '/customerpolicy': typeof CustomerpolicyRoute
   '/kontakt': typeof KontaktRoute
   '/om-oss': typeof OmOssRoute
   '/priser': typeof PriserRoute
@@ -67,6 +75,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/cookiepolicy': typeof CookiepolicyRoute
+  '/customerpolicy': typeof CustomerpolicyRoute
   '/kontakt': typeof KontaktRoute
   '/om-oss': typeof OmOssRoute
   '/priser': typeof PriserRoute
@@ -75,13 +84,27 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/cookiepolicy' | '/kontakt' | '/om-oss' | '/priser' | '/villkor'
+    | '/'
+    | '/cookiepolicy'
+    | '/customerpolicy'
+    | '/kontakt'
+    | '/om-oss'
+    | '/priser'
+    | '/villkor'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/cookiepolicy' | '/kontakt' | '/om-oss' | '/priser' | '/villkor'
+  to:
+    | '/'
+    | '/cookiepolicy'
+    | '/customerpolicy'
+    | '/kontakt'
+    | '/om-oss'
+    | '/priser'
+    | '/villkor'
   id:
     | '__root__'
     | '/'
     | '/cookiepolicy'
+    | '/customerpolicy'
     | '/kontakt'
     | '/om-oss'
     | '/priser'
@@ -91,6 +114,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CookiepolicyRoute: typeof CookiepolicyRoute
+  CustomerpolicyRoute: typeof CustomerpolicyRoute
   KontaktRoute: typeof KontaktRoute
   OmOssRoute: typeof OmOssRoute
   PriserRoute: typeof PriserRoute
@@ -111,6 +135,13 @@ declare module '@tanstack/react-router' {
       path: '/cookiepolicy'
       fullPath: '/cookiepolicy'
       preLoaderRoute: typeof CookiepolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/customerpolicy': {
+      id: '/customerpolicy'
+      path: '/customerpolicy'
+      fullPath: '/customerpolicy'
+      preLoaderRoute: typeof CustomerpolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/kontakt': {
@@ -147,6 +178,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CookiepolicyRoute: CookiepolicyRoute,
+  CustomerpolicyRoute: CustomerpolicyRoute,
   KontaktRoute: KontaktRoute,
   OmOssRoute: OmOssRoute,
   PriserRoute: PriserRoute,

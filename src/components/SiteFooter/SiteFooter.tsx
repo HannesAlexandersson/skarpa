@@ -12,6 +12,7 @@ export function SiteFooter() {
       </nav>
       <nav aria-label="Juridisk information" className="flex flex-col items-start gap-3">
         <Link to="/villkor" className="underline-offset-4 hover:underline">Användarvillkor</Link>
+        <Link to="/customerpolicy" className="underline-offset-4 hover:underline">Kundvillkor</Link>
         <Link to="/cookiepolicy" className="underline-offset-4 hover:underline">Cookiepolicy</Link>
       </nav>
     </div>
